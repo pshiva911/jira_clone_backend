@@ -25,20 +25,6 @@ exports.getIssuesInProject = async (req, res) => {
   res.json(issues).end();
 };
 
-// exports.createIssue = async (req, res) => {
-//   const { projectId, listId, assignees, ...data } = req.body; 
-//   const { _count: order } = await client.issue.aggregate({ where: { listId }, _count: true });
-//   const { id: issueId } = await client.issue.create({
-//     data: { ...data, order: order + 1, listId },
-//   });
-//   try{
-//     await client.assignee.createMany({ data: assignees.map((userId) => ({ issueId, userId })) });
-//   }
-//   catch(e){
-//     console.log(e)
-//   }
-//   res.json({ msg: 'issue is created' }).end();
-// };
 
 exports.createIssue = async (req, res) => {
   const { projectId, listId, assignees, ...data } = req.body;
