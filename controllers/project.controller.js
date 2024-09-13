@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const { badRequest } = require('./util')
 
+
 const client = new PrismaClient()
 
 exports.getProjects = async (req, res) => {

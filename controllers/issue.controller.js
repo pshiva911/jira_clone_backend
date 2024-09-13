@@ -1,5 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
+const mailTransporter = require('../utils/mailConfig')
 const { sameContainerReorder, diffContainerReorder, badRequest } = require('./util')
+const {genIssueAssignedTemplate} = require('./mailer.controller')
 
 const client = new PrismaClient()
 
@@ -50,6 +52,43 @@ exports.createIssue = async (req, res) => {
 		await client.assignee.createMany({
 			data: assignees.map((userId) => ({ issueId, userId, projectId })),
 		})
+
+
+		const projectDetails = await client.project.findFirst({
+			where: { id: +projectId },
+		})
+
+		const reporterDetails = await client.user.findFirst({
+			where: { id: +data.reporterId }
+		})
+
+		const assignedUsers = await client.user.findMany({
+			where: {
+				id: {
+					in: assignees, // 'assignees' is your array of user IDs
+				},
+			},
+		});
+
+		const issueName = data.summary
+
+		async function sendEmailsToAssignedUsers(assignedUsers, projectDetails, reporterDetails, issueName) {
+			for (const user of assignedUsers) {
+				const mailDetails = genIssueAssignedTemplate(user.email, user.username, projectDetails.name, reporterDetails.username, issueName);
+
+				try {
+					const data = await mailTransporter.sendMail(mailDetails);
+					console.log(`Mail sent successfully to ${user.email}:`);
+				} catch (err) {
+					console.error(`Error sending mail to ${user.email}: ${err.message}`);
+				}
+			}
+		}
+
+		// Example usage:
+		sendEmailsToAssignedUsers(assignedUsers, projectDetails, reporterDetails, issueName);
+
+
 		res.json({ msg: 'issue is created' }).end()
 	} catch (err) {
 		console.log(err)
@@ -75,6 +114,36 @@ exports.updateIssue = async (req, res) => {
 				break
 			case 'addAssignee':
 				await Promise.all([client.assignee.create({ data: { issueId: id, userId: value, projectId } }), updatedAt(id)])
+				
+				const userDetails =  await client.user.findFirst({
+					where: { id: +value },
+					select: { id: true, username: true, email: true, profileUrl: false },
+				}) 
+
+				const issueDetails = await client.issue.findFirst({
+					where: { id }
+				})
+
+				const reporterDetails = await client.user.findFirst({
+					where: { id: +issueDetails.reporterId }
+				})
+				
+				const projectDetails = await client.project.findFirst({
+					where: { id: +projectId },
+				}) 
+
+				const mailDetails = genIssueAssignedTemplate(userDetails.email, userDetails.username, projectDetails.name, reporterDetails.username, issueDetails.summary)
+				mailTransporter.sendMail(mailDetails,(err,data) => {
+					if(err){
+						console.log(`error sending mail : ${err}`)
+					}
+					else{
+						console.log(`mail sent successfully : ${JSON.parse(data)}`)				
+					}
+			
+				})
+
+
 				break
 			case 'removeAssignee':
 				await Promise.all([client.assignee.deleteMany({ where: { AND: { issueId: id, userId: value } } }), updatedAt(id)])

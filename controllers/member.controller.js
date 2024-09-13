@@ -1,5 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const { badRequest } = require('./util')
+const {genAddToProjectTemplate,genRemovedFromProjectTemplate} = require('./mailer.controller')
+const mailTransporter = require('../utils/mailConfig')
 
 const client = new PrismaClient()
 
@@ -25,14 +27,29 @@ exports.getMembersInProject = async (req, res) => {
 exports.addMember = async (req, res) => {
 	try {
 		const { projectId, userId } = req.body
-		const member = client.member.create({
+		const member = await client.member.create({
 			data: { userId, projectId: +projectId },
 		})
-		const project = client.project.update({
+		const user = await client.user.findFirst({
+			where: { id: +userId },
+			select: { id: true, username: true, email: true, profileUrl: false },
+		})
+		const project = await client.project.update({
 			where: { id: projectId },
 			data: { updatedAt: new Date(Date.now()).toISOString() },
 		})
-		await Promise.all([member, project])
+		// await Promise.all([member, project,user])
+		console.log(project)
+		const mailDetails = genIssueAssignedTemplate(user.email,user.username,project.name)
+		mailTransporter.sendMail(mailDetails,(err,data) => {
+			if(err){
+				console.log(`error sending mail : ${err}`)
+			}
+			else{
+				console.log(`mail sent successfully : ${JSON.parse(data)}`)				
+			}
+	
+		})
 		res.json(member).end()
 	} catch (err) {
 		console.log(err)
@@ -43,13 +60,29 @@ exports.addMember = async (req, res) => {
 exports.removeMember = async (req, res) => {
 	try {
 		const { memberId: id, projectId, userId } = req.body
-		const member = client.member.delete({ where: { id } })
-		const removeAssignees = client.assignee.deleteMany({ where: { AND: { userId, projectId } } })
-		const project = client.project.update({
+		const user = await client.user.findFirst({
+			where: { id: +userId },
+			select: { id: true, username: true, email: true, profileUrl: false },
+		})
+		const member =await  client.member.delete({ where: { id } })
+		const removeAssignees = await client.assignee.deleteMany({ where: { AND: { userId, projectId } } })
+		const project = await client.project.update({
 			where: { id: projectId },
 			data: { updatedAt: new Date(Date.now()).toISOString() },
 		})
-		await Promise.all([member, removeAssignees, project])
+		
+		// await Promise.all([member, removeAssignees, project,user])
+		console.log(project)
+		const mailDetails = genRemovedFromProjectTemplate(user.email,user.username,project.name)
+		mailTransporter.sendMail(mailDetails,(err,data) => {
+			if(err){
+				console.log(`error sending mail : ${err}`)
+			}
+			else{
+				console.log(`mail sent successfully : ${JSON.parse(data)}`)				
+			}
+	
+		})
 		res.json(member).end()
 	} catch (err) {
 		console.log(err)
