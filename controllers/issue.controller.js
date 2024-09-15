@@ -130,8 +130,7 @@ exports.updateIssue = async (req, res) => {
 				
 				const projectDetails = await client.project.findFirst({
 					where: { id: +projectId },
-				}) 
-
+				}) 				
 				const mailDetails = genIssueAssignedTemplate(userDetails.email, userDetails.username, projectDetails.name, reporterDetails.username, issueDetails.summary)
 				mailTransporter.sendMail(mailDetails,(err,data) => {
 					if(err){

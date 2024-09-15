@@ -12,7 +12,7 @@ exports.register = async (req, res) => {
 		const user = await client.user.create({ data: { ...req.body, pwd } })
 		const token = generateJwt({ uid: user.id })
 		createCookie(res, token)
-		await client.member.create({ data: { userId: user.id, projectId: 4 } })
+		// await client.member.create({ data: { userId: user.id, projectId: 4 } })
 		res.json(user).end() // send back newly created user obj
 	} catch (err) {
 		console.log(err)

@@ -22,6 +22,7 @@ const { restrictProjectMiddleware } = require('./utils/restrictProjectMiddleware
 const corOptions = {
 	credentials: true,
 	origin: true,
+	methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
 }
 
 app.use(cors(corOptions))
@@ -58,4 +59,4 @@ app.use('/api/member', restrictProjectMiddleware, memberRoute)
 app.use('/api/comment', restrictProjectMiddleware, commentRoute)
 
 
-app.listen(80)
+app.listen(process.env.PORT)

@@ -19,6 +19,7 @@ exports.getUsers = async (req, res) => {
 }
 
 exports.getAuthUser = async (req, res) => {
+	console.log("fetching user details ....")
 	try {
 		const { pwd, ...user } = await client.user.findFirst({ where: { id: req.user.uid } })
 		res.json(user).end()

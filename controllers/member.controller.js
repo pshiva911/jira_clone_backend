@@ -39,8 +39,7 @@ exports.addMember = async (req, res) => {
 			data: { updatedAt: new Date(Date.now()).toISOString() },
 		})
 		// await Promise.all([member, project,user])
-		console.log(project)
-		const mailDetails = genIssueAssignedTemplate(user.email,user.username,project.name)
+		const mailDetails = genAddToProjectTemplate(user.email,user.username,project.name)
 		mailTransporter.sendMail(mailDetails,(err,data) => {
 			if(err){
 				console.log(`error sending mail : ${err}`)
@@ -70,9 +69,6 @@ exports.removeMember = async (req, res) => {
 			where: { id: projectId },
 			data: { updatedAt: new Date(Date.now()).toISOString() },
 		})
-		
-		// await Promise.all([member, removeAssignees, project,user])
-		console.log(project)
 		const mailDetails = genRemovedFromProjectTemplate(user.email,user.username,project.name)
 		mailTransporter.sendMail(mailDetails,(err,data) => {
 			if(err){

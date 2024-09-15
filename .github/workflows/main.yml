@@ -39,10 +39,4 @@ jobs:
             sudo docker stop jira_backend || true
             sudo docker rm jira_backend || true
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ github.sha }}
-            sudo docker run --rm -d 
-            -p 80:80 
-            -e JWT_ACCESS_TOKEN_SECRET=${{secrets.JWT_ACCESS_TOKEN_SECRET}}
-            -e DATABASE_URL_PLANET_SCALE=${{secrets.DATABASE_URL_PLANET_SCALE}}
-            -e ADMIN_MAILID=${{secrets.ADMIN_MAILID}}
-            -e ADMIN_MAILPASS=${{secrets.ADMIN_MAILPASS}}
-            --name jira_backend ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ github.sha }}
+            sudo docker run --rm -d -p 8080:80 -e JWT_ACCESS_TOKEN_SECRET=${{secrets.JWT_ACCESS_TOKEN_SECRET}} -e DATABASE_URL_PLANET_SCALE=${{secrets.DATABASE_URL_PLANET_SCALE}} -e ADMIN_MAILID=${{secrets.ADMIN_MAILID}} -e ADMIN_MAILPASS=${{secrets.ADMIN_MAILPASS}} -e COOKIE_DOMAIN={{secrets.COOKIE_DOMAIN}} --name jira_backend ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ github.sha }}
