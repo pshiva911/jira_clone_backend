@@ -15,6 +15,8 @@ const commentRoute = require('./routes/comment.route')
 const { authMiddleware } = require('./controllers/auth.controller')
 const { restrictProjectMiddleware } = require('./utils/restrictProjectMiddleware')
 
+const {upload} = require('./utils/s3upload')
+
 
 // const {genAddToProjectTemplate,genRemovedFromProjectTemplate,genIssueAssignedTemplate} = require('./controllers/mailer.controller')
 // const mailTransporter = require('./utils/mailConfig')
@@ -27,7 +29,8 @@ const corOptions = {
 
 app.use(cors(corOptions))
 app.use(cookieParser())
-app.use(express.json())
+// app.use(express.urlencoded({extended:false}))
+app.use(express.json({limit: '50mb'}));
 app.get('/ok', (req, res) => res.send('The server is active, buddy.').end())
 
 // app.get('/ok',async(req,res)=>{
@@ -47,14 +50,18 @@ app.get('/ok', (req, res) => res.send('The server is active, buddy.').end())
 // 	})
 // 	res.json('The server is active, buddy.')
 	
+
 // })
+
+app.use(express.urlencoded({extended:true}))
+
 
 app.use('/auth', authRoute)
 app.use(authMiddleware)
 app.use('/api/user', userRoute)
 app.use('/api/project', projectRoute)
-app.use('/api/list', restrictProjectMiddleware, listRoute)
-app.use('/api/issue', restrictProjectMiddleware, issueRoute)
+app.use('/api/list',restrictProjectMiddleware, listRoute)
+app.use('/api/issue', issueRoute)
 app.use('/api/member', restrictProjectMiddleware, memberRoute)
 app.use('/api/comment', restrictProjectMiddleware, commentRoute)
 
