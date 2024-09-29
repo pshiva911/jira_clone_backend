@@ -16,7 +16,7 @@ const s3Client = new S3Client({
 
 const uploadFiletoS3 = async (file, fileExt) => {
     // Construct the path to the file to be uploaded
-    const filePath = path.join("uploads", `s3uploading object${fileExt}`);
+    const filePath = path.join("uploads", `s3uploading-object${fileExt}`);
     
     // Create a read stream for the file
     const readStream = fs.createReadStream(filePath);
@@ -49,10 +49,8 @@ const storage = multer.diskStorage({
       cb(null, 'uploads');  // Set the upload destination
     },
     filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + 'abcd-' + Math.round(Math.random() * 1E9);
       const fileExtension = path.extname(file.originalname);  // Get the file extension
       cb(null, "s3uploading-object"+fileExtension);  // Append the extension
-    //   uploadFiletoS3(file,fileExtension)
     }
 });
   
