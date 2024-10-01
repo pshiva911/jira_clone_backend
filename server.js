@@ -21,13 +21,24 @@ const {upload} = require('./utils/s3upload')
 // const {genAddToProjectTemplate,genRemovedFromProjectTemplate,genIssueAssignedTemplate} = require('./controllers/mailer.controller')
 // const mailTransporter = require('./utils/mailConfig')
 
-const corOptions = {
-	credentials: true,
-	origin: ["https://77d8-65-1-2-195.ngrok-free.app"],
-	methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
+// const corOptions = {
+// 	credentials: true,
+// 	origin: ["https://77d8-65-1-2-195.ngrok-free.app"],
+// 	methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
+// }
+
+var whitelist = ['https://77d8-65-1-2-195.ngrok-free.app', 'http://example2.com']
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
 }
 
-app.use(cors(corOptions))
+app.use(cors(corsOptions))
 app.use(cookieParser())
 // app.use(express.urlencoded({extended:false}))
 app.use(express.json({limit: '50mb'}));
