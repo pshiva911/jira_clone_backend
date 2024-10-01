@@ -50,7 +50,7 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
       const fileExtension = path.extname(file.originalname);  // Get the file extension
-      cb(null, "s3uploading-object"+fileExtension);  // Append the extension
+      cb(null, "s3uploading-object");  // Append the extension
     }
 });
   

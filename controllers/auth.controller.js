@@ -5,9 +5,17 @@ const { badRequest, cookieConfig } = require('./util')
 
 const client = new PrismaClient()
 
+function validatePassword(password) {
+	const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+	return regex.test(password);
+}
+
 exports.register = async (req, res) => {
 	try {
 		if (await findUser(req.body.email)) return res.status(409).json({ message: 'user with this email already exists' }).end()
+		if(!validatePassword(req.body.pwd)){
+			return res.status(409).json({message : 'incorrect password format'}).end()
+		}
 		const pwd = await bcrypt.hash(req.body.pwd, 10)
 		const user = await client.user.create({ data: { ...req.body, pwd } })
 		const token = generateJwt({ uid: user.id })
@@ -47,6 +55,9 @@ exports.logOut = (req, res) => {
 exports.changePwd = async (req, res) => {
 	try {
 		const { oldPwd, newPwd } = req.body
+		if(!validatePassword(newPwd)){
+			return res.status(409).json({message : 'incorrect password format'}).end()
+		}
 		const id = +req.user.uid
 		const user = await client.user.findFirst({ where: { id } })
 		const isValidPwd = await bcrypt.compare(oldPwd, user.pwd)

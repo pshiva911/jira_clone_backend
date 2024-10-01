@@ -70,16 +70,16 @@ exports.createIssue = async (req, res) => {
 
 		// Generate random string and prepare file details
 		let attachmentName = ""
-		if (req.files) {
+		if (req.files && req.files[0]) {
 			const fileExtension = path.extname(req.files[0].originalname);
-			const randString = Math.round(Math.random() * 1E9);
-			const filePath = path.join("uploads", `s3uploading-object${fileExtension}`);
+			const randString = Math.round(Math.random() * 1E9)+Math.round(Math.random() * 1E9);
+			const filePath = path.join("uploads", `s3uploading-object`);
 			const readStream = fs.createReadStream(filePath);
 
 			// S3 upload parameters
 			const params = {
 				Bucket: process.env.S3_BUCKET,
-				Key: `${randString}_${req.files[0].originalname}`,  // Include random string in key
+				Key: `${randString}${fileExtension}`,  // Include random string in key
 				Body: readStream,
 				ACL: 'public-read',
 				ContentType: req.files[0].mimetype || 'application/octet-stream',  // Set content type
@@ -99,7 +99,7 @@ exports.createIssue = async (req, res) => {
 
 			// Await the completion of the upload
 			await parallelUploads3.done();
-			attachmentName = `https://jira-clone-attachments.s3.ap-south-1.amazonaws.com/${randString}_${req.files[0].originalname}`
+			attachmentName = `https://jira-clone-attachments.s3.ap-south-1.amazonaws.com/${randString}${fileExtension}`
 			// console.log('File uploaded successfully:', `https://jira-clone-attachments.s3.ap-south-1.amazonaws.com/${randString}_${req.files[0].originalname}`);
 		}
 

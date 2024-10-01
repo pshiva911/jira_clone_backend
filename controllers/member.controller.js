@@ -27,6 +27,12 @@ exports.getMembersInProject = async (req, res) => {
 exports.addMember = async (req, res) => {
 	try {
 		const { projectId, userId } = req.body
+		const findingMember = await client.member.findFirst({
+			where: { userId, projectId }
+		})
+		if(findingMember){
+			return res.status(400).json({message: 'Member already exists in the project'}).end()
+		}
 		const member = await client.member.create({
 			data: { userId, projectId: +projectId },
 		})
@@ -69,6 +75,20 @@ exports.removeMember = async (req, res) => {
 			where: { id: projectId },
 			data: { updatedAt: new Date(Date.now()).toISOString() },
 		})
+		// const {id : listIds} = await client.list.findMany({
+		// 	where : {projectId : projectId}
+		// })
+		// const issuesInProject = await client.issue.updateMany({
+		// 	where: {
+		// 	  AND: [
+		// 		{ listId: { in: listIds } },
+		// 		{ reporterId: userId }
+		// 	  ]
+		// 	},
+		// 	data : {
+		// 		reporterId : null
+		// 	}
+		// });		  
 		const mailDetails = genRemovedFromProjectTemplate(user.email,user.username,project.name)
 		mailTransporter.sendMail(mailDetails,(err,data) => {
 			if(err){
