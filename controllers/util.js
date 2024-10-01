@@ -41,6 +41,6 @@ const updateOrder = async ({ id, order, type, model }) => {
 
 const badRequest = (res) => res.status(400).json({ message: 'Whoop! Looks like your http request is missing something.' }).end()
 
-const cookieConfig = {maxAge: 60 * 60 * 24 * 15, httpOnly: true, secure: true, sameSite: 'none'}
+const cookieConfig = {domain : '3676-65-2-63-115.ngrok-free.app',maxAge: 60 * 60 * 24 * 15, httpOnly: true, secure: true, sameSite: 'none'}
 
 module.exports = { sameContainerReorder, diffContainerReorder, badRequest, cookieConfig }
