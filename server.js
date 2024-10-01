@@ -21,7 +21,7 @@ const {upload} = require('./utils/s3upload')
 // const {genAddToProjectTemplate,genRemovedFromProjectTemplate,genIssueAssignedTemplate} = require('./controllers/mailer.controller')
 // const mailTransporter = require('./utils/mailConfig')
 
-const corOptions = {
+const corsOptions = {
 	credentials: true,
 	origin: true,
 	methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
