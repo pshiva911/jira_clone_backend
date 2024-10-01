@@ -49,7 +49,10 @@ exports.logIn = async (req, res) => {
 }
 
 exports.logOut = (req, res) => {
-	res.clearCookie('jira-clone', cookieConfig).end()
+	res.clearCookie('jira-clone', cookieConfig)
+	res.clearCookie('abuse_interstitial', {...cookieConfig,httpOnly:false})
+	
+	res.end()
 }
 
 exports.changePwd = async (req, res) => {
