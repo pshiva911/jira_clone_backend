@@ -23,7 +23,7 @@ const {upload} = require('./utils/s3upload')
 
 const corOptions = {
 	credentials: true,
-	origin: "https://77d8-65-1-2-195.ngrok-free.app/",
+	origin: "https://77d8-65-1-2-195.ngrok-free.app",
 	methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
 }
 
