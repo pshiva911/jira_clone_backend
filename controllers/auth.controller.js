@@ -49,8 +49,12 @@ exports.logIn = async (req, res) => {
 }
 
 exports.logOut = (req, res) => {
-	res.clearCookie('jira-clone', cookieConfig)
-	res.clearCookie('abuse_interstitial', {...cookieConfig,httpOnly:false})
+	const cookies = req.cookies;
+    for (const cookieName in cookies) {
+        if (cookies.hasOwnProperty(cookieName)) {
+            res.clearCookie(cookieName);
+        }
+    }
 	
 	res.end()
 }
