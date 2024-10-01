@@ -28,15 +28,17 @@ const {upload} = require('./utils/s3upload')
 // }
 
 var whitelist = ['https://77d8-65-1-2-195.ngrok-free.app', 'http://example2.com']
-var corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
+const corsOptions = {
+	origin: function (origin, callback) {
+	  if (whitelist.indexOf(origin) !== -1 || !origin) {
+		callback(null, true)
+	  } else {
+		callback(new Error('Not allowed by CORS'))
+	  }
+	},
+	credentials: true
   }
-}
+  
 
 app.use(cors(corsOptions))
 app.use(cookieParser())
